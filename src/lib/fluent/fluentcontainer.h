@@ -32,12 +32,46 @@
 #ifndef FLUENTCONTAINER_H
 #define FLUENTCONTAINER_H
 
-#include "fluentcontainer.impl.copy.h"
+#include "fluentcontainer.impl.as.h"
 #include "fluentcontainer.impl.transform.h"
 #include "fluentcontainer.impl.filter.h"
-#include <numeric>
+#include "fluentcontainer.impl.reduce.h"
 
 namespace fluent {
+
+template<class I, class O>
+class FluentToKeyValueConvertor
+{
+public:
+    explicit FluentToKeyValueConvertor(I &&container)
+        : m_container {std::move(container)}
+    {
+    }
+    template<class KF, class VF>
+    FluentContainer<O> map(KF &&keyCallable, VF &&valueCallable)
+    {
+        return FluentContainer<O>(std::move(details::TransformPolicy<I, O>::transform(m_container, keyCallable, valueCallable)));
+    }
+private:
+    I m_container;
+};
+
+template<class I, class O>
+class FluentToValueConvertor
+{
+public:
+    explicit FluentToValueConvertor(I &&container)
+        : m_container {std::move(container)}
+    {
+    }
+    template<class F>
+    FluentContainer<O> map(F &&callable)
+    {
+        return FluentContainer<O>(std::move(details::TransformPolicy<I, O>::transform(m_container, callable)));
+    }
+private:
+    I m_container;
+};
 
 template<class C>
 class FluentContainer
@@ -52,22 +86,29 @@ public:
     FluentContainer & operator=(const FluentContainer &) = delete;
     FluentContainer & operator=(FluentContainer &&) = default;
     template<class O>
-    FluentContainer<O> as()
+    typename details::AsPolicy<C, O>::ReturnType as()
     {
-        return FluentContainer<O>(details::CopyPolicy<C, O>::copy(m_container));
+        return details::AsPolicy<C, O>::as(m_container);
     }
     template<class F>
-    FluentContainer<C> map(F callable)
+    FluentContainer<C> map(F &&callable)
     {
+        static_assert(details::ContainerTraits<C>::containerType == details::ValueContainerType, "You can only map values on ValueContainerType");
         return FluentContainer<C>(std::move(details::TransformPolicy<C, C>::transform(m_container, callable)));
     }
-    template<class F, class ReturnType>
-    ReturnType reduce(F callable, ReturnType initialValue)
+    template<class KF, class VF>
+    FluentContainer<C> map(KF &&keyCallable, VF &&valueCallable)
     {
-        return std::accumulate(m_container.begin(), m_container.end(), initialValue, callable);
+        static_assert(details::ContainerTraits<C>::containerType == details::KeyValueContainerType, "You can only map keys and values on KeyValueContainerType");
+        return FluentContainer<C>(std::move(details::TransformPolicy<C, C>::transform(m_container, keyCallable, valueCallable)));
+    }
+    template<class F, class R>
+    R reduce(F &&callable, R initialValue)
+    {
+        return details::ReducePolicy<C>::reduce(m_container, callable, initialValue);
     }
     template<class F>
-    FluentContainer<C> filter(F callable)
+    FluentContainer<C> filter(F &&callable)
     {
         return FluentContainer<C>(std::move(details::FilterPolicy<C>::filter(m_container, callable)));
     }

@@ -45,7 +45,7 @@ template<class C>
 struct FilterPolicy<C, ValueContainerType, DefaultFilterPolicyType>
 {
     template<class F>
-    static C filter(const C &container, F callable)
+    static C filter(const C &container, F &&callable)
     {
         C returned {};
         AlgorithmPolicy<C>::copy_if(container, returned, callable);
@@ -57,7 +57,7 @@ template<class C>
 struct FilterPolicy<C, ValueContainerType, InPlaceFilterPolicyType>
 {
     template<class F>
-    static C & filter(C &container, F callable)
+    static C & filter(C &container, F &&callable)
     {
         AlgorithmPolicy<C>::inplace_filter(container, callable);
         return container;
@@ -68,7 +68,7 @@ template<class C>
 struct FilterPolicy<C, KeyValueContainerType, DefaultFilterPolicyType>
 {
     template<class F>
-    static C filter(const C &container, F callable)
+    static C filter(const C &container, F &&callable)
     {
         C returned {};
 

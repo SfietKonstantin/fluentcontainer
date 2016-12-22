@@ -44,11 +44,11 @@ template<class I, class O,
          int TPT = ContainerAlgorithmTraits<O>::transformPolicyType>
 struct TransformPolicy;
 
-template<class I, class O, int IT>
-struct TransformPolicy<I, O, IT, ValueContainerType, DefaultTransformPolicyType>
+template<class I, class O>
+struct TransformPolicy<I, O, ValueContainerType, ValueContainerType, DefaultTransformPolicyType>
 {
     template<class F>
-    static O transform(const I &container, F callable)
+    static O transform(const I &container, F &&callable)
     {
         O returned {};
         AlgorithmPolicy<O>::transform(container, returned, callable);
@@ -56,11 +56,44 @@ struct TransformPolicy<I, O, IT, ValueContainerType, DefaultTransformPolicyType>
     }
 };
 
-template<class I, class O, int IT>
-struct TransformPolicy<I, O, IT, KeyValueContainerType, DefaultTransformPolicyType>
+template<class I, class O>
+struct TransformPolicy<I, O, ValueContainerType, KeyValueContainerType, DefaultTransformPolicyType>
+{
+    template<class KF, class VF>
+    static O transform(const I &container, KF &&keyCallable, VF &&valueCallable)
+    {
+        O returned {};
+        using V = typename I::value_type;
+        AlgorithmPolicy<O>::transform(container, returned, [&keyCallable, &valueCallable](const V &value) {
+            using R = typename O::value_type;
+            return R {keyCallable(value), valueCallable(value)};
+        });
+        return returned;
+    }
+};
+
+template<class I, class O>
+struct TransformPolicy<I, O, KeyValueContainerType, KeyValueContainerType, DefaultTransformPolicyType>
+{
+    template<class KF, class VF>
+    static O transform(const I &container, KF &&keyCallable, VF &&valueCallable)
+    {
+        O returned {};
+
+        using V = typename I::value_type;
+        AlgorithmPolicy<O>::transform(container, returned, [&keyCallable, &valueCallable](const V &value) {
+            using R = typename O::value_type;
+            return R {keyCallable(value.first, value.second), valueCallable(value.first, value.second)};
+        });
+        return returned;
+    }
+};
+
+template<class I, class O, int TPT>
+struct TransformPolicy<I, O, KeyValueContainerType, ValueContainerType, TPT>
 {
     template<class F>
-    static O transform(const I &container, F callable)
+    static O transform(I &container, F &&callable)
     {
         O returned {};
 
@@ -76,7 +109,7 @@ template<class C>
 struct TransformPolicy<C, C, ValueContainerType, ValueContainerType, InPlaceTransformPolicyType>
 {
     template<class F>
-    static C & transform(C &container, F callable)
+    static C & transform(C &container, F &&callable)
     {
         AlgorithmPolicy<C>::inplace_transform(container, callable);
         return container;

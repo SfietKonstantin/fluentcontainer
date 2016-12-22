@@ -16,6 +16,8 @@ set(${PROJECT_NAME}_LIB_SRCS
     ${fluentdir}/fluentcontainer.impl.copy.h
     ${fluentdir}/fluentcontainer.impl.transform.h
     ${fluentdir}/fluentcontainer.impl.filter.h
+    ${fluentdir}/fluentcontainer.impl.reduce.h
+    ${fluentdir}/fluentcontainer.impl.as.h
     ${fluentdir}/fluentcontainer.hash.h
     ${fluentdir}/fluentcontainer.map.h
     ${fluentdir}/fluentcontainer.set.h
@@ -26,6 +28,8 @@ set(${PROJECT_NAME}_SRCS
     testdata.cpp
     tst_contiguous.cpp
     tst_set.cpp
+    tst_converter.cpp
+    tst_keyvalue.cpp
 )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_LIB_SRCS} ${${PROJECT_NAME}_SRCS})

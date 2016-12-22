@@ -46,13 +46,13 @@ template<class C>
 struct AlgorithmPolicy<C, ContiguousStorageType>
 {
     template<class I, class F>
-    static void transform(const I &inputContainer, C &outputContainer, F callable)
+    static void transform(const I &inputContainer, C &outputContainer, F &&callable)
     {
         std::transform(inputContainer.begin(), inputContainer.end(),
                        std::back_inserter(outputContainer), callable);
     }
     template<class F>
-    static void inplace_transform(C &container, F callable)
+    static void inplace_transform(C &container, F &&callable)
     {
         std::transform(container.begin(), container.end(), container.begin(), callable);
     }
@@ -63,13 +63,13 @@ struct AlgorithmPolicy<C, ContiguousStorageType>
                   std::back_inserter(outputContainer));
     }
     template<class I, class F>
-    static void copy_if(const I &inputContainer, C &outputContainer, F callable)
+    static void copy_if(const I &inputContainer, C &outputContainer, F &&callable)
     {
         std::copy_if(inputContainer.begin(), inputContainer.end(),
                      std::back_inserter(outputContainer), callable);
     }
     template<class F>
-    static void inplace_filter(C &container, F callable)
+    static void inplace_filter(C &container, F &&callable)
     {
         using V = typename C::value_type;
         auto it = std::remove_if(container.begin(), container.end(), [&callable](const V &value) {
@@ -83,7 +83,7 @@ template<class C>
 struct AlgorithmPolicy<C, TreeBasedStorageType>
 {
     template<class I, class F>
-    static void transform(const I &inputContainer, C &outputContainer, F callable)
+    static void transform(const I &inputContainer, C &outputContainer, F &&callable)
     {
         std::transform(inputContainer.begin(), inputContainer.end(),
                        std::inserter(outputContainer, outputContainer.begin()), callable);
@@ -95,7 +95,7 @@ struct AlgorithmPolicy<C, TreeBasedStorageType>
                   std::inserter(outputContainer, outputContainer.begin()));
     }
     template<class I, class F>
-    static void copy_if(const I &inputContainer, C &outputContainer, F callable)
+    static void copy_if(const I &inputContainer, C &outputContainer, F &&callable)
     {
         std::copy_if(inputContainer.begin(), inputContainer.end(),
                      std::inserter(outputContainer, outputContainer.begin()), callable);

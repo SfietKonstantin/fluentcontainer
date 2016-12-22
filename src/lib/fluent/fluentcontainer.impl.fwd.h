@@ -77,6 +77,16 @@ struct ContainerAlgorithmTraits
 };
 
 } // namespace details
+
+template<class C>
+class FluentContainer;
+
+template<class I, class O>
+class FluentToKeyValueConvertor;
+
+template<class I, class O>
+class FluentToValueConvertor;
+
 } // namespace fluent
 
 #endif // FLUENTCONTAINER_FWD_H
