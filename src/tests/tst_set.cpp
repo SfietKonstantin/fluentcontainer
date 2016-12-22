@@ -112,7 +112,7 @@ TEST_F(SetTest, Filter)
 {
     // implem of filter with set requires copy_if, so we cannot do it with non-copiable classes
     std::set<int> values {1, 2, 3, 4, 5};
-    auto result {fluent::from(values).filter([](int item) { return item % 2 == 0;})};
+    auto result {fluent::fromValue(values).filter([](int item) { return item % 2 == 0;})};
     std::set<int> reference {2, 4};
     EXPECT_EQ(*result, reference);
 }
@@ -121,7 +121,7 @@ TEST_F(SetTest, AsWithCopy1)
 {
     // implem of as to different classes requires copy, so we cannot do it with non-copiable classes
     std::set<int> values {1, 2, 3, 4, 5};
-    auto result {fluent::from(values).as<std::vector<int>>()};
+    auto result {fluent::fromValue(values).as<std::vector<int>>()};
     std::vector<int> reference {1, 2, 3, 4, 5};
     EXPECT_EQ(*result, reference);
 }
@@ -129,7 +129,7 @@ TEST_F(SetTest, AsWithCopy1)
 TEST_F(SetTest, AsWithCopy2)
 {
     std::vector<int> values {4, 3, 5, 2, 1};
-    auto result {fluent::from(values).as<std::set<int>>()};
+    auto result {fluent::fromValue(values).as<std::set<int>>()};
     std::set<int> reference {1, 2, 3, 4, 5};
     EXPECT_EQ(*result, reference);
 }

@@ -172,7 +172,7 @@ TEST_F(ContiguousTest, DequeFilter)
 {
     // non-inplace implem of filter requires copy_if, so we cannot do it with non-copiable classes
     std::deque<int> values {1, 2, 3, 4, 5};
-    auto result {fluent::from(values).filter([](int item) { return item % 2 == 0;})};
+    auto result {fluent::fromValue(values).filter([](int item) { return item % 2 == 0;})};
     std::deque<int> reference {2, 4};
     EXPECT_EQ(*result, reference);
 }
@@ -181,7 +181,7 @@ TEST_F(ContiguousTest, AsWithCopy1)
 {
     // implem of as to different classes requires copy, so we cannot do it with non-copiable classes
     std::deque<int> values {1, 2, 3, 4, 5};
-    auto result {fluent::from(values).as<std::vector<int>>()};
+    auto result {fluent::fromValue(values).as<std::vector<int>>()};
     std::vector<int> reference {1, 2, 3, 4, 5};
     EXPECT_EQ(*result, reference);
 }
@@ -189,7 +189,7 @@ TEST_F(ContiguousTest, AsWithCopy1)
 TEST_F(ContiguousTest, AsWithCopy2)
 {
     std::vector<int> values {1, 2, 3, 4, 5};
-    auto result {fluent::from(values).as<std::deque<int>>()};
+    auto result {fluent::fromValue(values).as<std::deque<int>>()};
     std::deque<int> reference {1, 2, 3, 4, 5};
     EXPECT_EQ(*result, reference);
 }

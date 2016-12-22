@@ -89,9 +89,15 @@ private:
 
 
 template<class C>
-static FluentContainer<C> from(C container)
+static FluentContainer<C> from(C &&container)
 {
     return FluentContainer<C>(std::move(container));
+}
+
+template<class C>
+static FluentContainer<C> fromValue(const C &container)
+{
+    return FluentContainer<C>(C(container));
 }
 
 } // namespace fluent
